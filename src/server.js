@@ -2,58 +2,23 @@ import { graphql, buildSchema } from 'graphql'
 import express from 'express'
 import bodyParser from 'body-parser'
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express'
+import { makeExecutableSchema } from 'graphql-tools'
+import { merge } from 'lodash'
 
-const schema = buildSchema(`
-type User {
-  id: ID!
-  username: String!
-  age: Int!
-  bio: String
-}
+// modules
+import user from './modules/user'
+import root from './modules/root'
 
-type Query {
-  hello: String
-
-  user ( id: ID): User
-}
-`)
-
-const fakeDb = {
-  users: [
-    {
-      id: 1,
-      username: 'Polo',
-      bio: 'The bio of Polo',
-      age: 22,
-    },
-    {
-      id: 2,
-      username: 'Chuck',
-      bio: 'The bio of Chuck',
-      age: 34,
-    },
-    {
-      id: 3,
-      username: 'Ricky',
-      bio: 'The bio of Ricky',
-      age: 56,
-    },
-  ],
-}
-
-const resolvers = {
-  hello() {
-    return 'Hello World'
-  },
-  user({ id }) {
-    return fakeDb.users.find(user => user.id === Number(id))
-  },
-}
+const schema = makeExecutableSchema({
+  typeDefs: [root.schema, user.schema],
+  resolvers: merge(root.resolvers, user.resolvers),
+})
 
 const app = express()
+
 app.use(bodyParser.json())
 
-app.use('/graphql', graphqlExpress({ schema, rootValue: resolvers }))
+app.use('/graphql', graphqlExpress({ schema }))
 
 app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
 
