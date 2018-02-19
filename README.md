@@ -95,7 +95,7 @@ const user = userLoader.load(1) // returns user #1
 
 Then if you run the query again, each API endpoint will be called juste once
 
-```graphql
+```shell
 GET /users/ 200 1.353 ms - 390
 GET /users/2 200 1.612 ms - 104
 GET /users/3 200 0.923 ms - 111
