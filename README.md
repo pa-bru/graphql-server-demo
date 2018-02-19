@@ -44,6 +44,56 @@ A mutation is one the the 3 GraphQL operations (Query, Mutation, Subscription):
 
 * Subscription: used to subscribe to event based updates (web-socket). <br>E.g: When someone likes your post on Facebook, you get a notification.
 
+## 06-optimizing-queries-with-dataloader
+
+I you run the GraphQL server and try a query like this...
+
+```graphql
+{
+  users {
+    id
+    username
+    friends {
+      id
+      username
+    }
+  }
+}
+```
+
+You can see that it works. You retrieve users and users's friends indeed.
+
+However if you look at your terminal console you can figure out that you call same API endpoints several times.
+This is because some users have friends that are users you already get in the query.
+
+E.g: user #2 and #1 are each called 2 times
+
+```shell
+GET /users/ 200 5.965 ms - 390
+GET /users/ 200 0.585 ms - 390
+GET /users/2 200 2.227 ms - 104
+GET /users/3 200 1.163 ms - 111
+GET /users/1 200 1.161 ms - 109
+GET /users/1 200 1.185 ms - 109
+GET /users/2 200 1.216 ms - 104
+```
+
+We can't have a production ready GraphQL server if we don't optimize GraphQL queries. So we need to batch API calls.
+
+[Dataloader] is a Facebook package which can achieve that.
+
+To make the batching work you have to instanciate a new Dataloader and pass to it a function to resolve your API calls by keys. Then instead of calling directly the user API in your resolver functions you need to call the `load(key)` function of your dataloader instance.
+
+E.g
+
+```js
+import Dataloader from 'dataloader'
+
+const userLoader = new Dataloader(ids => Promise.all(ids.map(getById)))
+
+const user = userLoader.load(1) // returns user #1
+```
+
 [graphql.js]: https://github.com/graphql/graphql-js
 [express.js]: http://expressjs.com/
 [apollo-server-express]: https://github.com/apollographql/apollo-server
@@ -51,3 +101,4 @@ A mutation is one the the 3 GraphQL operations (Query, Mutation, Subscription):
 [graphql-tools]: https://github.com/apollographql/graphql-tools
 [json-server]: https://github.com/typicode/json-server
 [npm-run-all]: https://www.npmjs.com/package/npm-run-all
+[dataloader]: https://github.com/facebook/dataloader
