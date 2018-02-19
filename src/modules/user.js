@@ -48,7 +48,7 @@ const resolvers = {
   },
   User: {
     friends(user) {
-      return user.friends.map(id => getById(id))
+      return Promise.all(user.friends.map(getById))
     },
   },
   Mutation: {
