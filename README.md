@@ -69,7 +69,6 @@ This is because some users have friends that are users you already get in the qu
 E.g: user #2 and #1 are each called 2 times
 
 ```shell
-GET /users/ 200 5.965 ms - 390
 GET /users/ 200 0.585 ms - 390
 GET /users/2 200 2.227 ms - 104
 GET /users/3 200 1.163 ms - 111
@@ -92,6 +91,15 @@ import Dataloader from 'dataloader'
 const userLoader = new Dataloader(ids => Promise.all(ids.map(getById)))
 
 const user = userLoader.load(1) // returns user #1
+```
+
+Then if you run the query again, each API endpoint will be called juste once
+
+```graphql
+GET /users/ 200 1.353 ms - 390
+GET /users/2 200 1.612 ms - 104
+GET /users/3 200 0.923 ms - 111
+GET /users/1 200 0.948 ms - 109
 ```
 
 [graphql.js]: https://github.com/graphql/graphql-js
