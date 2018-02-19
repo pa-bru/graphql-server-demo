@@ -1,8 +1,7 @@
 {
   "name": "graphql-demo",
   "version": "1.0.0",
-  "description":
-    "GraphQL demo to understand how it works and how to set up a GraphQL server",
+  "description": "GraphQL demo to understand how it works and how to set up a GraphQL server",
   "main": "dist/server.js",
   "scripts": {
     "dev": "npm-run-all --parallel fake-api babel-node",

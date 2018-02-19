@@ -4,9 +4,10 @@ import bodyParser from 'body-parser'
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express'
 import { makeExecutableSchema } from 'graphql-tools'
 import { merge } from 'lodash'
+import Dataloader from 'dataloader'
 
 // modules
-import user from './modules/user'
+import user, { getById } from './modules/user'
 import root from './modules/root'
 
 const schema = makeExecutableSchema({
@@ -18,7 +19,13 @@ const app = express()
 
 app.use(bodyParser.json())
 
-app.use('/graphql', graphqlExpress({ schema }))
+app.use(
+  '/graphql',
+  graphqlExpress(req => {
+    const userLoader = new Dataloader(ids => Promise.all(ids.map(getById)))
+    return { schema, context: { req, userLoader } }
+  })
+)
 
 app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
 

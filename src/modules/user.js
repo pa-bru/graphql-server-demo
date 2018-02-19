@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const fakeApiUrl = 'http://localhost:5000'
-const getById = id => {
+
+export const getById = id => {
   return axios.get(`${fakeApiUrl}/users/${id}`).then(res => {
     return res.data
   })
@@ -39,16 +40,16 @@ const schema = `
 
 const resolvers = {
   Query: {
-    user(_, { id }) {
-      return getById(id)
+    user(root, { id }, ctx) {
+      return ctx.userLoader.load(id)
     },
     users() {
       return getUsers()
     },
   },
   User: {
-    friends(user) {
-      return user.friends.map(id => getById(id))
+    friends(user, args, ctx) {
+      return ctx.userLoader.loadMany(user.friends)
     },
   },
   Mutation: {
