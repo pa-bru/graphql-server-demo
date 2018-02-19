@@ -1,30 +1,22 @@
-const fakeDb = {
-  users: [
-    {
-      id: 1,
-      username: 'Polo',
-      bio: 'The bio of Polo',
-      age: 22,
-      friends: [2, 3],
-    },
-    {
-      id: 2,
-      username: 'Chuck',
-      bio: 'The bio of Chuck',
-      age: 34,
-      friends: [1],
-    },
-    {
-      id: 3,
-      username: 'Ricky',
-      bio: 'The bio of Ricky',
-      age: 56,
-      friends: [1, 2],
-    },
-  ],
+import axios from 'axios'
+
+const fakeApiUrl = 'http://localhost:5000'
+const getById = id => {
+  return axios.get(`${fakeApiUrl}/users/${id}`).then(res => {
+    return res.data
+  })
+}
+const getUsers = () => {
+  return axios.get(`${fakeApiUrl}/users/`).then(res => {
+    return res.data
+  })
 }
 
-const getById = id => fakeDb.users.find(user => user.id === Number(id))
+const addUser = data => {
+  return axios.post(`${fakeApiUrl}/users/`, data).then(res => {
+    return res.data
+  })
+}
 
 const schema = `
   type User {
@@ -35,8 +27,13 @@ const schema = `
     friends: [User]
   }
 
+  extend type Mutation {
+    addUser(id: ID!, age: Int!, username: String!, bio: String, friends: [Int]): User
+  }
+
   extend type Query {
     user ( id: ID): User
+    users: [User]
   }
 `
 
@@ -45,10 +42,18 @@ const resolvers = {
     user(_, { id }) {
       return getById(id)
     },
+    users() {
+      return getUsers()
+    },
   },
   User: {
     friends(user) {
       return user.friends.map(id => getById(id))
+    },
+  },
+  Mutation: {
+    addUser(_, { id, age, username, bio = '', friends = [] }) {
+      return addUser({ id, age, bio, username, friends })
     },
   },
 }

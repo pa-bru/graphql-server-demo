@@ -1,0 +1,25 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "Polo",
+      "bio": "The bio of Polo",
+      "age": 22,
+      "friends": [2, 3]
+    },
+    {
+      "id": 2,
+      "username": "Chuck",
+      "bio": "The bio of Chuck",
+      "age": 34,
+      "friends": [1]
+    },
+    {
+      "id": 3,
+      "username": "Ricky",
+      "bio": "The bio of Ricky",
+      "age": 56,
+      "friends": [1, 2]
+    }
+  ]
+}
