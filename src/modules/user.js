@@ -7,8 +7,12 @@ export const getById = id => {
     return res.data
   })
 }
-const getUsers = () => {
-  return axios.get(`${fakeApiUrl}/users/`).then(res => {
+const getUsers = limit => {
+  let query = ''
+  if (limit) {
+    query = `?_limit=${limit}`
+  }
+  return axios.get(`${fakeApiUrl}/users/${query}`).then(res => {
     return res.data
   })
 }
@@ -23,9 +27,9 @@ const schema = `
   type User {
     id: ID!
     username: String!
-    age: Int!
+    age: Int! @cost(complexity: 2)
     bio: String
-    friends: [User]
+    friends: [User] @cost
   }
 
   extend type Mutation {
@@ -34,7 +38,7 @@ const schema = `
 
   extend type Query {
     user ( id: ID): User
-    users: [User]
+    users(limit: Int = 1): [User] @cost(multipliers:["limit"])
   }
 `
 
@@ -43,8 +47,8 @@ const resolvers = {
     user(root, { id }, ctx) {
       return ctx.userLoader.load(id)
     },
-    users() {
-      return getUsers()
+    users(_, { limit }) {
+      return getUsers(limit)
     },
   },
   User: {

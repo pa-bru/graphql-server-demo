@@ -1,7 +1,7 @@
 export default {
   schema: `
     type Query {
-      hello: String
+      hello: String @cost(complexity: 5)
     }
     type Mutation
 
